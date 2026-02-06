@@ -11,4 +11,9 @@ void main() {
   for (Ride ride in filteredRide) {
     print(ride);
   }
+  RidesService.filterBy(
+    departure: Location(name: "Dijon", country: Country.france),
+    seatsRequested: 2,
+  ); // Shall return 1 ride 
+
 }
