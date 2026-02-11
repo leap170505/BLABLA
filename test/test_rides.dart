@@ -1,19 +1,19 @@
 import 'package:blabla/model/ride/ride.dart';
-
 import 'package:blabla/model/ride/locations.dart';
 import 'package:blabla/services/rides_service.dart';
+import 'package:flutter_test/flutter_test.dart';
+
 
 void main() {
-  Location dijon = Location(country: Country.france, name: "Dijon");
-
-  List<Ride> filteredRide = RidesService.filter(requestedSeats: 2, departureLocation: dijon);
-
-  for (Ride ride in filteredRide) {
-    print(ride);
-  }
-  RidesService.filterBy(
-    departure: Location(name: "Dijon", country: Country.france),
-    seatsRequested: 2,
-  ); // Shall return 1 ride 
-
+    test('filterBy with both criteria returns correct ride', () {
+      final departure = Location(name: "Dijon", country: Country.france);
+      final result = RidesService.filterBy(
+        departure: departure,
+        seatRequested: 2,
+      );
+      for (Ride ride in result ) {
+      print(ride);
+    }
+      expect(result.length, 1);
+    });
 }
