@@ -6,6 +6,7 @@ import '../../../theme/theme.dart';
 import '../../../widgets/display/bla_button.dart';
 import '../../../../utils/date_time_util.dart';
 import 'ride_pref_input_tile.dart';
+import 'location_picker_screen.dart';
 
 class RidePrefForm extends StatefulWidget {
   // The form can be created with an optional initial RidePref.
@@ -53,25 +54,74 @@ class _RidePrefFormState extends State<RidePrefForm> {
     });
   }
 
-  void _onDeparturePressed() {
-    print("Departure pressed");
+  Future<void> _onDeparturePressed() async {
+    final location = await Navigator.of(context).push<Location>(
+      MaterialPageRoute(
+        builder: (ctx) => LocationPickerScreen(initLocation: departure),
+      ),
+    );
+    if (location != null) {
+      setState(() {
+        departure = location;
+      });
+    }
   }
 
-  void _onArrivalPressed() {
-    print("Arrival pressed");
+  Future<void> _onArrivalPressed() async {
+    final location = await Navigator.of(context).push<Location>(
+      MaterialPageRoute(
+        builder: (ctx) => LocationPickerScreen(initLocation: arrival),
+      ),
+    );
+    if (location != null) {
+      setState(() {
+        arrival = location;
+      });
+    }
   }
 
-  void _onDatePressed() {
-    print("Date pressed");
+  Future<void> _onDatePressed() async {
+    final now = DateTime.now();
+    final newDate = await showDatePicker(
+      context: context,
+      initialDate: departureDate,
+      firstDate: now,
+      lastDate: now.add(const Duration(days: 365)),
+    );
+    if (newDate != null) {
+      setState(() {
+        departureDate = newDate;
+      });
+    }
   }
 
-  void _onSeatsPressed() {
-    print("Seats pressed");
+  Future<void> _onSeatsPressed() async {
+    // Simple dialog for seats
+    final int? newSeats = await showDialog<int>(
+      context: context,
+      builder: (ctx) => SimpleDialog(
+        title: Text("Number of seats"),
+        children: [
+          for (int i = 1; i <= 8; i++)
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(ctx, i),
+              child: Text("$i"),
+            ),
+        ],
+      ),
+    );
+    if (newSeats != null) {
+      setState(() {
+        requestedSeats = newSeats;
+      });
+    }
   }
 
   void _onSearchPressed() {
     if (departure == null || arrival == null) {
-      print("Please select both departure and arrival");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select both departure and arrival locations', style: TextStyle(color: Colors.white),), backgroundColor: Colors.red,),
+      );
       return;
     }
 
@@ -83,7 +133,6 @@ class _RidePrefFormState extends State<RidePrefForm> {
     );
 
     print("Search triggered with: $newRidePref");
-    
   }
 
   // ----------------------------------
