@@ -93,6 +93,22 @@ class _RidePrefFormState extends State<RidePrefForm> {
       });
     }
   }
+  
+
+  Future<void> _onDatePressed() async {
+    final now = DateTime.now();
+    final newDate = await showDatePicker(
+      context: context,
+      initialDate: departureDate,
+      firstDate: now,
+      lastDate: now.add(const Duration(days: 365)),
+    );
+    if (newDate != null) {
+      setState(() {
+        departureDate = newDate;
+      });
+    }
+  }
 
   void _onSearchPressed() {
     if (departure == null || arrival == null) {
@@ -161,7 +177,7 @@ class _RidePrefFormState extends State<RidePrefForm> {
     return RidePrefInputTile(
       icon: Icons.calendar_month_outlined,
       label: _dateLabel,
-      onTap: () => {},
+      onTap: _onDatePressed,
     );
   }
 
