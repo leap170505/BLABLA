@@ -1,12 +1,13 @@
+import 'package:blabla/ui/widgets/actions/bla_button.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../model/ride/locations.dart';
 import '../../../../model/ride_pref/ride_pref.dart';
 import '../../../theme/theme.dart';
-import '../../../widgets/display/bla_button.dart';
 import '../../../../utils/date_time_util.dart';
 import 'ride_pref_input_tile.dart';
 import 'location_picker_screen.dart';
+import 'seat_spinner.dart';
 
 class RidePrefForm extends StatefulWidget {
   // The form can be created with an optional initial RidePref.
@@ -80,34 +81,10 @@ class _RidePrefFormState extends State<RidePrefForm> {
     }
   }
 
-  Future<void> _onDatePressed() async {
-    final now = DateTime.now();
-    final newDate = await showDatePicker(
-      context: context,
-      initialDate: departureDate,
-      firstDate: now,
-      lastDate: now.add(const Duration(days: 365)),
-    );
-    if (newDate != null) {
-      setState(() {
-        departureDate = newDate;
-      });
-    }
-  }
-
   Future<void> _onSeatsPressed() async {
-    // Simple dialog for seats
-    final int? newSeats = await showDialog<int>(
-      context: context,
-      builder: (ctx) => SimpleDialog(
-        title: Text("Number of seats"),
-        children: [
-          for (int i = 1; i <= 8; i++)
-            SimpleDialogOption(
-              onPressed: () => Navigator.pop(ctx, i),
-              child: Text("$i"),
-            ),
-        ],
+    final int? newSeats = await Navigator.of(context).push<int>(
+      MaterialPageRoute(
+        builder: (ctx) => SeatSpinner(initialValue: requestedSeats),
       ),
     );
     if (newSeats != null) {
@@ -120,7 +97,13 @@ class _RidePrefFormState extends State<RidePrefForm> {
   void _onSearchPressed() {
     if (departure == null || arrival == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select both departure and arrival locations', style: TextStyle(color: Colors.white),), backgroundColor: Colors.red,),
+        const SnackBar(
+          content: Text(
+            'Please select both departure and arrival locations',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+        ),
       );
       return;
     }
@@ -146,11 +129,10 @@ class _RidePrefFormState extends State<RidePrefForm> {
   bool get _isDeparturePlaceholder => departure == null;
   bool get _isArrivalPlaceholder => arrival == null;
 
-
   // ----------------------------------
   // Build the widgets
   // ----------------------------------
-  
+
   Widget _buildLocationInputs() {
     return Column(
       children: [
@@ -164,7 +146,7 @@ class _RidePrefFormState extends State<RidePrefForm> {
             icon: Icon(Icons.swap_vert, color: BlaColors.primary),
           ),
         ),
-        const Divider(height: 1, thickness: 0.5), 
+        const Divider(height: 1, thickness: 0.5),
         RidePrefInputTile(
           icon: Icons.radio_button_off_outlined,
           label: _arrivalLabel,
@@ -179,7 +161,7 @@ class _RidePrefFormState extends State<RidePrefForm> {
     return RidePrefInputTile(
       icon: Icons.calendar_month_outlined,
       label: _dateLabel,
-      onTap: _onDatePressed,
+      onTap: () => {},
     );
   }
 
@@ -209,13 +191,13 @@ class _RidePrefFormState extends State<RidePrefForm> {
             ],
           ),
         ),
-        
+
         SizedBox(height: BlaSpacings.m),
-        
+
         BlaButton(
-          label: "Search", 
+          label: "Search",
           onPressed: _onSearchPressed,
-          type: BlaButtonType.primary, 
+          type: BlaButtonType.primary,
         ),
       ],
     );
